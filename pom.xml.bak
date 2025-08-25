@@ -88,7 +88,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
-                    <!-- Use the system property to specify a different suite XML file -->
                     <suiteXmlFiles>
                         <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
@@ -108,12 +107,6 @@
                     </properties>
                     <reportFormat>plain</reportFormat>
                     <redirectTestOutputToFile>false</redirectTestOutputToFile>
-                    <!-- Force TestNG to use UTF-8 -->
-                    <argLine>-Dfile.encoding=UTF-8</argLine>
-                    <!-- Print debug information during test execution -->
-                    <systemPropertyVariables>
-                        <testng.verbose>10</testng.verbose>
-                    </systemPropertyVariables>
                 </configuration>
                 <dependencies>
                     <dependency>

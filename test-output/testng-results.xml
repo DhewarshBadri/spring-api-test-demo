@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results ignored="0" total="3" passed="3" failed="0" skipped="0">
+  <reporter-output>
+    <line>
+      <![CDATA[StandaloneTest setup executed]]>
+    </line>
+    <line>
+      <![CDATA[Running addition test: 2 + 2 = 4]]>
+    </line>
+    <line>
+      <![CDATA[Running multiplication test: 3 * 4 = 12]]>
+    </line>
+    <line>
+      <![CDATA[Running subtraction test: 5 - 3 = 2]]>
+    </line>
+  </reporter-output>
+  <suite started-at="2025-08-25T10:11:25 IST" name="Standalone Test Suite" finished-at="2025-08-25T10:11:25 IST" duration-ms="140">
+    <groups>
+    </groups>
+    <test started-at="2025-08-25T10:11:25 IST" name="Basic Tests" finished-at="2025-08-25T10:11:25 IST" duration-ms="140">
+      <class name="com.example.demo.utils.StandaloneTest">
+        <test-method is-config="true" signature="setup()[pri:0, instance:com.example.demo.utils.StandaloneTest@47af7f3d]" started-at="2025-08-25T10:11:25 IST" name="setup" finished-at="2025-08-25T10:11:25 IST" duration-ms="21" status="PASS">
+          <reporter-output>
+            <line>
+              <![CDATA[StandaloneTest setup executed]]>
+            </line>
+          </reporter-output>
+        </test-method> <!-- setup -->
+        <test-method signature="testAddition()[pri:0, instance:com.example.demo.utils.StandaloneTest@47af7f3d]" started-at="2025-08-25T10:11:25 IST" name="testAddition" finished-at="2025-08-25T10:11:25 IST" duration-ms="9" status="PASS">
+          <reporter-output>
+            <line>
+              <![CDATA[Running addition test: 2 + 2 = 4]]>
+            </line>
+          </reporter-output>
+        </test-method> <!-- testAddition -->
+        <test-method signature="testMultiplication()[pri:0, instance:com.example.demo.utils.StandaloneTest@47af7f3d]" started-at="2025-08-25T10:11:25 IST" name="testMultiplication" finished-at="2025-08-25T10:11:25 IST" duration-ms="6" status="PASS">
+          <reporter-output>
+            <line>
+              <![CDATA[Running multiplication test: 3 * 4 = 12]]>
+            </line>
+          </reporter-output>
+        </test-method> <!-- testMultiplication -->
+        <test-method signature="testSubtraction()[pri:0, instance:com.example.demo.utils.StandaloneTest@47af7f3d]" started-at="2025-08-25T10:11:25 IST" name="testSubtraction" finished-at="2025-08-25T10:11:25 IST" duration-ms="0" status="PASS">
+          <reporter-output>
+            <line>
+              <![CDATA[Running subtraction test: 5 - 3 = 2]]>
+            </line>
+          </reporter-output>
+        </test-method> <!-- testSubtraction -->
+      </class> <!-- com.example.demo.utils.StandaloneTest -->
+    </test> <!-- Basic Tests -->
+  </suite> <!-- Standalone Test Suite -->
+</testng-results>

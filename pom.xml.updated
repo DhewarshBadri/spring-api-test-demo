@@ -90,7 +90,7 @@
                 <configuration>
                     <!-- Use the system property to specify a different suite XML file -->
                     <suiteXmlFiles>
-                        <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
+                        <suiteXmlFile>${suiteXmlFile:src/test/resources/testng.xml}</suiteXmlFile>
                     </suiteXmlFiles>
                     <testFailureIgnore>true</testFailureIgnore>
                     <includes>

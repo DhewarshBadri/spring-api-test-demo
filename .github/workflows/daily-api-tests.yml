@@ -32,11 +32,31 @@ jobs:
         
     - name: Build and Test with Maven
       run: |
-        # Run tests with TestNG explicitly
-        echo "Running tests with TestNG explicitly"
-        mvn clean test -Dtestng.mode=true -DsuiteXmlFile=src/test/resources/testng.xml -Dsurefire.useFile=false -DtrimStackTrace=false
+        # Clean and compile the project first
+        mvn clean compile
         
-        # Check if tests were run
+        # Print debug information about test classes
+        echo "Available test classes:"
+        find src/test -name "*Test.java" | sort
+        
+        # Run the tests directly with TestNG
+        echo "Running tests directly with TestNG"
+        # Copy dependencies
+        mvn org.apache.maven.plugins:maven-dependency-plugin:3.1.2:copy-dependencies -DoutputDirectory=target/libs
+        
+        # Get the classpath
+        CLASSPATH=$(find target/libs -name "*.jar" | tr '\n' ':')
+        CLASSPATH="$CLASSPATH:target/classes:target/test-classes"
+        
+        # Run TestNG directly with the standalone test suite first (more reliable)
+        echo "Running standalone tests with TestNG"
+        java -cp "$CLASSPATH" org.testng.TestNG src/test/resources/standalone-testng.xml
+        
+        # Run the full test suite if standalone tests pass
+        echo "Running full test suite with TestNG"
+        java -cp "$CLASSPATH" org.testng.TestNG src/test/resources/testng.xml
+        
+        # Check for test results
         echo "Checking for test results"
         ls -la target/surefire-reports/ || echo "No surefire reports directory found"
         
@@ -47,6 +67,13 @@ jobs:
         echo "</head><body>" >> target/site/test-report.html
         echo "<h1>API Test Report</h1>" >> target/site/test-report.html
         echo "<p>Report generated on: $(date)</p>" >> target/site/test-report.html
+        
+        echo "<h2>Test Discovery</h2>" >> target/site/test-report.html
+        echo "<h3>Test Classes Found:</h3>" >> target/site/test-report.html
+        echo "<pre>" >> target/site/test-report.html
+        find src/test -name "*Test.java" | sort >> target/site/test-report.html
+        echo "</pre>" >> target/site/test-report.html
+        
         echo "<h2>Test Results</h2>" >> target/site/test-report.html
         
         # Extract test results if they exist
@@ -77,11 +104,6 @@ jobs:
           echo "<li>Tests might be excluded from the build</li>" >> target/site/test-report.html
           echo "<li>Tests might be in an unexpected location</li>" >> target/site/test-report.html
           echo "</ul>" >> target/site/test-report.html
-          
-          echo "<h3>Test Classes Found:</h3>" >> target/site/test-report.html
-          echo "<pre>" >> target/site/test-report.html
-          find src/test -name "*Test.java" | sort >> target/site/test-report.html
-          echo "</pre>" >> target/site/test-report.html
         fi
         
         echo "<h2>Build Information</h2>" >> target/site/test-report.html

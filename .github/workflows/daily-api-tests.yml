@@ -78,7 +78,6 @@ jobs:
         from: ${{ secrets.EMAIL_SENDER }}
         html_body: true
         attachments: ${{ env.REPORT_PATH }}
-        content_type: text/html
-        # Outlook specific settings
-        secure: true
-        ignore_cert: false
+        # Security settings
+        secure: false
+        ignore_cert: true

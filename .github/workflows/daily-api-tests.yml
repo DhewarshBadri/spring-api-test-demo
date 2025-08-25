@@ -32,26 +32,36 @@ jobs:
         
     - name: Build and Test with Maven
       run: |
-        mvn clean test
-        mkdir -p target/surefire-reports/
-        touch target/surefire-reports/test-report.html
+        mvn clean test surefire-report:report
+        mkdir -p target/site/
+        if [ ! -f target/site/surefire-report.html ]; then
+          echo "Creating fallback report"
+          echo "<html><body><h1>Test Report</h1><p>Tests executed on $(date)</p></body></html>" > target/site/surefire-report.html
+        fi
       
     - name: Upload Test Reports
       uses: actions/upload-artifact@v4
       if: always()
       with:
         name: test-reports
-        path: target/surefire-reports/
-        if-no-files-found: ignore
+        path: |
+          target/surefire-reports/
+          target/site/
+        if-no-files-found: warn
         
     - name: Find HTML Test Report
       id: find-report
       if: always()
       run: |
-        REPORT_PATH=$(find target/surefire-reports -name "*.html" | head -n 1)
+        REPORT_PATH=$(find target/site -name "*report.html" | head -n 1)
+        if [ -z "$REPORT_PATH" ]; then
+          REPORT_PATH=$(find target/surefire-reports -name "*.html" | head -n 1)
+        fi
         if [ -z "$REPORT_PATH" ]; then
           echo "No HTML report found, using placeholder"
-          REPORT_PATH="target/surefire-reports/test-report.html"
+          mkdir -p target/site/
+          echo "<html><body><h1>Test Report</h1><p>No detailed test report was generated. Please check the GitHub Actions logs for test results.</p></body></html>" > target/site/test-report.html
+          REPORT_PATH="target/site/test-report.html"
         fi
         echo "REPORT_PATH=$REPORT_PATH" >> $GITHUB_ENV
         echo "Report path: $REPORT_PATH"

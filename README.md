@@ -9,11 +9,24 @@ This project demonstrates a Spring Boot application with a simple REST API, auto
   - `model`: Data models
 - `src/test/java`: Test code
   - `api`: API tests using RestAssured
-  - `utils`: Utility classes for reporting and email
+  - `utils`: Utility classes for reporting
+- `docs`: Documentation
+  - `testing-framework.md`: Overview of the testing framework
+  - `email-integration.md`: Guide for setting up email notifications
+  - `teams-integration.md`: Guide for setting up Microsoft Teams notifications
 
 ## API Endpoints
 
 - GET `/api/getBalance/{accountId}`: Returns balance information for a given account ID
+
+## Documentation
+
+For detailed information about the testing framework and how to use it, please refer to the following documentation:
+
+- [Testing Framework Overview](docs/testing-framework.md)
+- [Email Integration Setup](docs/email-integration.md)
+- [Microsoft Teams Integration](docs/teams-integration.md)
+- [Contributing Guidelines](CONTRIBUTING.md)
 
 ## Setup Instructions
 
@@ -88,6 +101,29 @@ Test reports are generated using a custom TestNG listener and are available:
 
 1. In the GitHub Actions artifacts after each workflow run
 2. Via email to the configured recipients after each workflow run
+
+### Test Report Configuration
+
+The test reporting system has been enhanced to:
+
+1. Generate HTML reports in both TestNG's default `test-output` directory and Maven's `target/surefire-reports` directory
+2. Generate Maven-compatible XML reports in the `target/surefire-reports` directory
+3. Ensure all reports are properly uploaded as GitHub Actions artifacts
+
+#### TestNG Configuration
+
+The project uses two TestNG XML configuration files:
+- `src/test/resources/standalone-testng.xml` - A minimal suite that runs basic tests
+- `src/test/resources/testng.xml` - The full test suite
+
+Both files are configured to use the custom `TestReportListener` for report generation.
+
+#### Custom Report Listener
+
+The `TestReportListener` class implements TestNG's `IReporter` interface and:
+- Generates HTML reports with test results
+- Creates Maven Surefire-compatible XML reports
+- Ensures reports are generated in the correct locations for both local runs and CI/CD
 
 ## Notes on Email Configuration
 

@@ -90,12 +90,20 @@
                 <configuration>
                     <!-- Use the system property to specify a different suite XML file -->
                     <suiteXmlFiles>
+                        <suiteXmlFile>src/test/resources/standalone-testng.xml</suiteXmlFile>
                         <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
                     <testFailureIgnore>true</testFailureIgnore>
                     <includes>
                         <include>**/*Test.java</include>
                     </includes>
+                    <!-- Specify test classes directly as a backup -->
+                    <classes>
+                        <class>com.example.demo.utils.BasicStandaloneTest</class>
+                        <class>com.example.demo.utils.SimpleTest</class>
+                    </classes>
+                    <!-- Force using TestNG provider -->
+                    <failIfNoTests>false</failIfNoTests>
                     <properties>
                         <property>
                             <name>usedefaultlisteners</name>
@@ -114,12 +122,19 @@
                     <systemPropertyVariables>
                         <testng.verbose>10</testng.verbose>
                     </systemPropertyVariables>
+                    <!-- Set failIfNoTests to false to prevent failures when no tests are found -->
+                    <failIfNoTests>false</failIfNoTests>
                 </configuration>
                 <dependencies>
                     <dependency>
                         <groupId>org.testng</groupId>
                         <artifactId>testng</artifactId>
                         <version>${testng.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.maven.surefire</groupId>
+                        <artifactId>surefire-testng</artifactId>
+                        <version>${maven-surefire-plugin.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>

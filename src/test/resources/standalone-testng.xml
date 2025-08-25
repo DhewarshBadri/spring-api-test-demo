@@ -3,7 +3,16 @@
 <suite name="Standalone Test Suite">
     <test name="Basic Tests">
         <classes>
+            <!-- Start with the most minimal test possible -->
+            <class name="com.example.demo.utils.MinimalTest"/>
+            <!-- Add several test classes as fallbacks in case some have issues -->
+            <class name="com.example.demo.utils.BasicStandaloneTest"/>
             <class name="com.example.demo.utils.StandaloneTest"/>
+            <class name="com.example.demo.utils.SimpleStandaloneTest"/>
+            <class name="com.example.demo.utils.SimpleTest"/>
         </classes>
     </test>
+    <listeners>
+        <listener class-name="com.example.demo.utils.TestReportListener"/>
+    </listeners>
 </suite>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="API Test Suite">
+    <test name="Balance API Tests">
+        <classes>
+            <class name="com.example.demo.api.BalanceApiTest"/>
+        </classes>
+    </test>
+    <listeners>
+        <listener class-name="com.example.demo.utils.TestReportListener"/>
+    </listeners>
+</suite>

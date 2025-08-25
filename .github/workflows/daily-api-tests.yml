@@ -1,0 +1,62 @@
+name: Daily API Tests
+
+on:
+  schedule:
+    # Run daily at 9:00 AM UTC
+    - cron: '0 9 * * *'
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: maven
+        
+    - name: Build and Test with Maven
+      run: mvn clean test
+      
+    - name: Upload Test Reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-reports
+        path: target/surefire-reports/
+        
+    - name: Find HTML Test Report
+      id: find-report
+      if: always()
+      run: |
+        REPORT_PATH=$(find target/surefire-reports -name "*.html" | head -n 1)
+        echo "REPORT_PATH=$REPORT_PATH" >> $GITHUB_ENV
+        echo "Report path: $REPORT_PATH"
+        
+    - name: Send Email with Test Report
+      if: always()
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: ${{ secrets.SMTP_SERVER }}
+        server_port: ${{ secrets.SMTP_PORT }}
+        username: ${{ secrets.SMTP_USERNAME }}
+        password: ${{ secrets.SMTP_PASSWORD }}
+        subject: API Test Report - ${{ github.repository }} - ${{ github.workflow }}
+        body: |
+          <h2>API Test Report</h2>
+          <p>Repository: ${{ github.repository }}</p>
+          <p>Workflow: ${{ github.workflow }}</p>
+          <p>Run ID: ${{ github.run_id }}</p>
+          <p>See attached HTML report for details.</p>
+          <p>View the full run details: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}</p>
+        to: ${{ secrets.EMAIL_RECIPIENTS }}
+        from: ${{ secrets.EMAIL_SENDER }}
+        html_body: true
+        attachments: ${{ env.REPORT_PATH }}
+        content_type: text/html

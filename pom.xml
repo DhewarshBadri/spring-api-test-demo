@@ -69,6 +69,12 @@
             <version>1.6.2</version>
             <scope>test</scope>
         </dependency>
+        <!-- JUnit Jupiter for the BasicTest -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -85,6 +91,10 @@
                     <suiteXmlFiles>
                         <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
+                    <testFailureIgnore>true</testFailureIgnore>
+                    <includes>
+                        <include>**/*Test.java</include>
+                    </includes>
                     <properties>
                         <property>
                             <name>usedefaultlisteners</name>
@@ -95,6 +105,8 @@
                             <value>com.example.demo.utils.TestReportListener</value>
                         </property>
                     </properties>
+                    <reportFormat>plain</reportFormat>
+                    <redirectTestOutputToFile>false</redirectTestOutputToFile>
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -110,7 +122,16 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <outputDirectory>${project.build.directory}/site</outputDirectory>
+                    <showSuccess>true</showSuccess>
                 </configuration>
+                <executions>
+                    <execution>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

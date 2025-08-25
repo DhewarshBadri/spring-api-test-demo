@@ -32,12 +32,63 @@ jobs:
         
     - name: Build and Test with Maven
       run: |
-        mvn clean test surefire-report:report
+        # Create a custom test report with actual test information
+        echo "Running tests with detailed logging"
+        mvn clean test -Dsurefire.useFile=false -DtrimStackTrace=false
+        
+        # Generate a report file with test details even if no tests were found
         mkdir -p target/site/
-        if [ ! -f target/site/surefire-report.html ]; then
-          echo "Creating fallback report"
-          echo "<html><body><h1>Test Report</h1><p>Tests executed on $(date)</p></body></html>" > target/site/surefire-report.html
+        echo "<html><head><title>API Test Report</title>" > target/site/test-report.html
+        echo "<style>body{font-family:Arial,sans-serif;margin:20px;line-height:1.6} h1,h2{color:#0066cc} table{border-collapse:collapse;width:100%;margin-bottom:20px} th,td{padding:10px;text-align:left;border:1px solid #ddd} th{background-color:#f2f2f2}</style>" >> target/site/test-report.html
+        echo "</head><body>" >> target/site/test-report.html
+        echo "<h1>API Test Report</h1>" >> target/site/test-report.html
+        echo "<p>Report generated on: $(date)</p>" >> target/site/test-report.html
+        echo "<h2>Test Results</h2>" >> target/site/test-report.html
+        
+        # Extract test results if they exist
+        TEST_COUNT=$(find target/surefire-reports -name "*.xml" | wc -l)
+        
+        if [ "$TEST_COUNT" -gt 0 ]; then
+          echo "<p>Tests executed: $TEST_COUNT</p>" >> target/site/test-report.html
+          echo "<table><tr><th>Test Class</th><th>Method</th><th>Status</th><th>Duration</th></tr>" >> target/site/test-report.html
+          
+          for TEST_XML in $(find target/surefire-reports -name "*.xml"); do
+            TEST_CLASS=$(grep "testclass=" "$TEST_XML" | head -1 | sed 's/.*testclass="\([^"]*\)".*/\1/')
+            TEST_NAME=$(grep "name=" "$TEST_XML" | head -1 | sed 's/.*name="\([^"]*\)".*/\1/')
+            TEST_TIME=$(grep "time=" "$TEST_XML" | head -1 | sed 's/.*time="\([^"]*\)".*/\1/')
+            
+            if grep -q "failure" "$TEST_XML"; then
+              STATUS="Failed"
+            else
+              STATUS="Passed"
+            fi
+            
+            echo "<tr><td>$TEST_CLASS</td><td>$TEST_NAME</td><td>$STATUS</td><td>${TEST_TIME}s</td></tr>" >> target/site/test-report.html
+          done
+          echo "</table>" >> target/site/test-report.html
+        else
+          echo "<p>No test results found. This could be because:</p>" >> target/site/test-report.html
+          echo "<ul>" >> target/site/test-report.html
+          echo "<li>TestNG suite configuration might not be correctly set up</li>" >> target/site/test-report.html
+          echo "<li>Tests might be excluded from the build</li>" >> target/site/test-report.html
+          echo "<li>Tests might be in an unexpected location</li>" >> target/site/test-report.html
+          echo "</ul>" >> target/site/test-report.html
+          
+          echo "<h3>Test Classes Found:</h3>" >> target/site/test-report.html
+          echo "<pre>" >> target/site/test-report.html
+          find src/test -name "*Test.java" | sort >> target/site/test-report.html
+          echo "</pre>" >> target/site/test-report.html
         fi
+        
+        echo "<h2>Build Information</h2>" >> target/site/test-report.html
+        echo "<table>" >> target/site/test-report.html
+        echo "<tr><td>Repository</td><td>${GITHUB_REPOSITORY}</td></tr>" >> target/site/test-report.html
+        echo "<tr><td>Branch</td><td>${GITHUB_REF_NAME}</td></tr>" >> target/site/test-report.html
+        echo "<tr><td>Commit</td><td>${GITHUB_SHA}</td></tr>" >> target/site/test-report.html
+        echo "<tr><td>Build Date</td><td>$(date)</td></tr>" >> target/site/test-report.html
+        echo "</table>" >> target/site/test-report.html
+        
+        echo "</body></html>" >> target/site/test-report.html
       
     - name: Upload Test Reports
       uses: actions/upload-artifact@v4
@@ -49,22 +100,12 @@ jobs:
           target/site/
         if-no-files-found: warn
         
-    - name: Find HTML Test Report
+    - name: Set Report Path
       id: find-report
       if: always()
       run: |
-        REPORT_PATH=$(find target/site -name "*report.html" | head -n 1)
-        if [ -z "$REPORT_PATH" ]; then
-          REPORT_PATH=$(find target/surefire-reports -name "*.html" | head -n 1)
-        fi
-        if [ -z "$REPORT_PATH" ]; then
-          echo "No HTML report found, using placeholder"
-          mkdir -p target/site/
-          echo "<html><body><h1>Test Report</h1><p>No detailed test report was generated. Please check the GitHub Actions logs for test results.</p></body></html>" > target/site/test-report.html
-          REPORT_PATH="target/site/test-report.html"
-        fi
-        echo "REPORT_PATH=$REPORT_PATH" >> $GITHUB_ENV
-        echo "Report path: $REPORT_PATH"
+        echo "REPORT_PATH=target/site/test-report.html" >> $GITHUB_ENV
+        echo "Report path: target/site/test-report.html"
         
     - name: Send Email with Test Report
       if: always() && (github.event_name != 'workflow_dispatch' || github.event.inputs.send_email == 'true')

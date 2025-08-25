@@ -4,6 +4,7 @@
     <test name="Balance API Tests">
         <classes>
             <class name="com.example.demo.api.BalanceApiTest"/>
+            <class name="com.example.demo.utils.BasicTest"/>
         </classes>
     </test>
     <listeners>

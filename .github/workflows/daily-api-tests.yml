@@ -61,10 +61,10 @@ jobs:
       uses: dawidd6/action-send-mail@v3
       continue-on-error: true
       with:
-        server_address: smtp.gmail.com
-        server_port: 465
-        username: ${{ secrets.GMAIL_USERNAME }}
-        password: ${{ secrets.GMAIL_APP_PASSWORD }}
+        server_address: smtp.sendgrid.net
+        server_port: 587
+        username: apikey
+        password: ${{ secrets.SENDGRID_API_KEY }}
         subject: "API Test Report - ${{ github.repository }} - ${{ github.workflow }}"
         body: |
           <h2>API Test Report</h2>
@@ -75,7 +75,7 @@ jobs:
           <p>View the full run details: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}</p>
           <p>This is an automated email sent from GitHub Actions.</p>
         to: ${{ secrets.EMAIL_RECIPIENTS }}
-        from: ${{ secrets.GMAIL_USERNAME }}
+        from: ${{ secrets.EMAIL_SENDER }}
         html_body: true
         attachments: ${{ env.REPORT_PATH }}
         # Security settings

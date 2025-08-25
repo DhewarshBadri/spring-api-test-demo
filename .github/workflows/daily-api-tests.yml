@@ -32,9 +32,13 @@ jobs:
         
     - name: Build and Test with Maven
       run: |
-        # Create a custom test report with actual test information
-        echo "Running tests with detailed logging"
-        mvn clean test -Dsurefire.useFile=false -DtrimStackTrace=false
+        # Run tests with TestNG explicitly
+        echo "Running tests with TestNG explicitly"
+        mvn clean test -Dtestng.mode=true -DsuiteXmlFile=src/test/resources/testng.xml -Dsurefire.useFile=false -DtrimStackTrace=false
+        
+        # Check if tests were run
+        echo "Checking for test results"
+        ls -la target/surefire-reports/ || echo "No surefire reports directory found"
         
         # Generate a report file with test details even if no tests were found
         mkdir -p target/site/

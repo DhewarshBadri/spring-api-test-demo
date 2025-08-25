@@ -75,6 +75,7 @@ jobs:
           <p>View the full run details: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}</p>
           <p>This is an automated email sent from GitHub Actions.</p>
         to: ${{ secrets.EMAIL_RECIPIENTS }}
+        from_name: "GitHub Workflow"
         from: ${{ secrets.EMAIL_SENDER }}
         html_body: true
         attachments: ${{ env.REPORT_PATH }}

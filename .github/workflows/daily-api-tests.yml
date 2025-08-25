@@ -31,7 +31,10 @@ jobs:
         cache: maven
         
     - name: Build and Test with Maven
-      run: mvn clean test
+      run: |
+        mvn clean test
+        mkdir -p target/surefire-reports/
+        touch target/surefire-reports/test-report.html
       
     - name: Upload Test Reports
       uses: actions/upload-artifact@v4
@@ -39,24 +42,30 @@ jobs:
       with:
         name: test-reports
         path: target/surefire-reports/
+        if-no-files-found: ignore
         
     - name: Find HTML Test Report
       id: find-report
       if: always()
       run: |
         REPORT_PATH=$(find target/surefire-reports -name "*.html" | head -n 1)
+        if [ -z "$REPORT_PATH" ]; then
+          echo "No HTML report found, using placeholder"
+          REPORT_PATH="target/surefire-reports/test-report.html"
+        fi
         echo "REPORT_PATH=$REPORT_PATH" >> $GITHUB_ENV
         echo "Report path: $REPORT_PATH"
         
     - name: Send Email with Test Report
       if: always() && (github.event_name != 'workflow_dispatch' || github.event.inputs.send_email == 'true')
       uses: dawidd6/action-send-mail@v3
+      continue-on-error: true
       with:
         server_address: ${{ secrets.SMTP_SERVER }}
         server_port: ${{ secrets.SMTP_PORT }}
         username: ${{ secrets.SMTP_USERNAME }}
         password: ${{ secrets.SMTP_PASSWORD }}
-        subject: API Test Report - ${{ github.repository }} - ${{ github.workflow }}
+        subject: "API Test Report - ${{ github.repository }} - ${{ github.workflow }}"
         body: |
           <h2>API Test Report</h2>
           <p>Repository: ${{ github.repository }}</p>
@@ -64,8 +73,12 @@ jobs:
           <p>Run ID: ${{ github.run_id }}</p>
           <p>See attached HTML report for details.</p>
           <p>View the full run details: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}</p>
+          <p>This is an automated email sent from GitHub Actions.</p>
         to: ${{ secrets.EMAIL_RECIPIENTS }}
         from: ${{ secrets.EMAIL_SENDER }}
         html_body: true
         attachments: ${{ env.REPORT_PATH }}
         content_type: text/html
+        # Outlook specific settings
+        secure: true
+        ignore_cert: false
